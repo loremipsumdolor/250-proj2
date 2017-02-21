@@ -31,7 +31,7 @@
             <Slider blockIncrement="5.0" max="5.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
             <ImageView fitHeight="81.0" fitWidth="607.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@Starsandfuck.png" />
+                  <Image url="@resources/StarRating.png" />
                </image>
             </ImageView>
          </children>
