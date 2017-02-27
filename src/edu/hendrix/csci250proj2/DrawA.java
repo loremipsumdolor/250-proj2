@@ -1,26 +1,18 @@
 package edu.hendrix.csci250proj2;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-import javafx.scene.image.Image;
-
 public class DrawA {
-		
-		private String path;
-		
-		
-		public static String readFile() throws IOException {
-			Scanner in = new Scanner(new File("DrawAWhat.txt"));
-			File document = new File("DrawAWhat.txt");
-			FileReader read = new FileReader(document);
-			String s = in.nextLine();
-			
-			read.close();
-			return s;
-			
+	public static ArrayList<String> readFile() throws FileNotFoundException {
+		ArrayList<String> potentialDrawings = new ArrayList<String>();
+		Scanner fileScanner = new Scanner(new File("resources/DrawAWhat.txt"));
+		while (fileScanner.hasNextLine()) {
+			potentialDrawings.add(fileScanner.nextLine());
 		}
-	
+		fileScanner.close();
+		return potentialDrawings;
+	}
 }

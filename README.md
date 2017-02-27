@@ -5,6 +5,6 @@ This is a multiplayer painting game created for [Dr. Ferrer's](http://ozark.hend
 
 Project members include:
 * [Shane Atchley](http://github.com/sosatchley), project leader
-* Chantal Danyluk
+* [Chantal Danyluk](http://github.com/CDanyluk)
 * [Ethan Spurlock](http://github.com/racer161)
 * [Jacob Turner](http://github.com/loremipsumdolor)

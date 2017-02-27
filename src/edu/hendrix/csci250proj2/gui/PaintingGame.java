@@ -1,4 +1,4 @@
-package edu.hendrix.csci250proj2;
+package edu.hendrix.csci250proj2.gui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +10,7 @@ public class PaintingGame extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("CalculatorGUI.fxml"));
+			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("PaintingGameGUI.fxml"));
 			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);
 			primaryStage.show();
