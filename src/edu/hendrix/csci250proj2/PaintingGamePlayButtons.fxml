@@ -4,13 +4,10 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.effect.ImageInput?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.layout.BorderPane?>
@@ -19,19 +16,18 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.hendrix.csci250proj2.ControlGameplay">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
             <HBox prefHeight="41.0" prefWidth="570.0">
                <children>
-                  <Label alignment="CENTER" prefHeight="33.0" prefWidth="112.0" text="Please draw a:" />
-                  <TextField prefWidth="557.0" />
-                  <Button alignment="CENTER_RIGHT" mnemonicParsing="false" text="Done Painting!">
+                  <Label alignment="CENTER" prefHeight="33.0" prefWidth="112.0" text="Please draw:" />
+                  <TextField fx:id="pleasedraw" editable="false" prefHeight="31.0" prefWidth="463.0" />
+                  <Button fx:id="donepainting" mnemonicParsing="false" onAction="#open" text="Done Painting!">
                      <HBox.margin>
-                        <Insets />
+                        <Insets left="45.0" />
                      </HBox.margin>
                   </Button>
                </children>
@@ -40,7 +36,7 @@
                <children>
                   <VBox prefHeight="450.0" prefWidth="197.0">
                      <children>
-                        <TextArea prefHeight="159.0" prefWidth="141.0">
+                        <TextArea fx:id="userfield" editable="false" prefHeight="220.0" prefWidth="110.0">
                            <padding>
                               <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                            </padding>
@@ -57,46 +53,22 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <RadioButton mnemonicParsing="false" text="Red">
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Orange" GridPane.columnIndex="1">
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Yellow" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Green" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Blue" GridPane.rowIndex="2">
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </RadioButton>
-                              <RadioButton mnemonicParsing="false" text="Pink" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </RadioButton>
+                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Red" />
+                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Orange" GridPane.columnIndex="1" />
+                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Yellow" GridPane.rowIndex="1" />
+                              <Button mnemonicParsing="false" prefWidth="75.0" text="Green" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Button defaultButton="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Blue" GridPane.rowIndex="2" />
+                              <Button mnemonicParsing="false" prefWidth="75.0" text="Pink" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
-                        <Button mnemonicParsing="false" prefHeight="132.0" prefWidth="162.0" text="Erase" />
+                        <ToggleButton mnemonicParsing="false" prefHeight="73.0" prefWidth="157.0" text="Erase" />
                      </children>
                   </VBox>
                   <Canvas height="450.0" width="600.0">
                      <effect>
                         <ImageInput>
                            <source>
-                              <Image url="@resources/FramePainting.jpg" />
+                              <Image url="@FramePainting.jpg" />
                            </source>
                         </ImageInput>
                      </effect>
@@ -110,7 +82,7 @@
                         <Insets top="8.0" />
                      </HBox.margin>
                   </Label>
-                  <ProgressBar prefHeight="74.0" prefWidth="699.0" progress="0.0">
+                  <ProgressBar prefHeight="74.0" prefWidth="699.0" progress="1.0">
                      <HBox.margin>
                         <Insets top="8.0" />
                      </HBox.margin>
@@ -129,25 +101,4 @@
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
-   <top>
-      <MenuBar prefHeight="32.0" prefWidth="594.0" BorderPane.alignment="CENTER">
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-   </top>
 </BorderPane>
