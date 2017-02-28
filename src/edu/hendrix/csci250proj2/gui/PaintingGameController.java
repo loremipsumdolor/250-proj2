@@ -8,36 +8,70 @@ import java.util.concurrent.ThreadLocalRandom;
 import edu.hendrix.csci250proj2.DrawA;
 import edu.hendrix.csci250proj2.User;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.control.ProgressBar;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 public class PaintingGameController {
+	@FXML
+	ColorPicker colorChooser;
 	@FXML 
 	TextArea userfield;
 	@FXML
 	Button donepainting;
 	@FXML
-	Canvas picture;
+	Pane drawingArea;
 	@FXML
 	Label drawingPrompt;
 	@FXML
-	ProgressBar inkremaining;
+	ProgressBar inkRemaining;
+	@FXML
+	HBox drawingStuff;
+	@FXML
+	VBox colorStuff;
 	
 	private User user;
 	private int rating;
 	private int otherRating;
+	private double sx;
+	private double sy;
+	private Color currentColor = Color.BLACK;
+	private double inkRemainingDubs;
 	
 	@FXML
 	private void initialize() {
-		TextInputDialog signInDialog = new TextInputDialog("walter");
+		colorChooser.setValue(Color.BLACK);
+		colorChooser.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				currentColor = colorChooser.getValue();
+			}
+		});
+		drawingArea.setOnMouseDragged(event -> draw(event));
+		drawingArea.setOnMousePressed(event -> startDrag(event));
+		drawingArea.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+		drawingArea.setLayoutX(colorStuff.getWidth());
+		drawingArea.setLayoutY(drawingStuff.getHeight());
+		TextInputDialog signInDialog = new TextInputDialog();
 		signInDialog.setTitle("Painting Game");
 		signInDialog.setHeaderText("Welcome to Painting Game");
 		signInDialog.setContentText("Please enter your name:");
@@ -51,6 +85,24 @@ public class PaintingGameController {
 		} catch (Exception exc) {
 			outputMessage(exc.getMessage(), AlertType.ERROR);
 		}
+	}
+	
+	public void startDrag(MouseEvent event) {
+		sx = event.getX();
+		sy = event.getY();
+	}
+	
+	public void draw(MouseEvent event) {
+		double fx = event.getX();
+		double fy = event.getY();
+		Line line = new Line(sx, sy, fx, fy);
+		line.setStroke(currentColor);
+		line.setStrokeLineCap(StrokeLineCap.ROUND);
+		drawingArea.getChildren().add(line);
+		sx = fx;
+		sy = fy;
+		inkRemainingDubs -= .001;
+		inkRemaining.setProgress(inkRemainingDubs);
 	}
 	
 	private void setDone() {

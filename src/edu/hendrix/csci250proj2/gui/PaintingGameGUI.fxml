@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.effect.ImageInput?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.hendrix.csci250proj2.gui.PaintingGameController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.hendrix.csci250proj2.gui.PaintingGameController">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
-            <HBox alignment="TOP_CENTER">
+            <HBox fx:id="drawingStuff" alignment="TOP_CENTER">
                <children>
                   <Label alignment="CENTER" text="Please draw:">
                      <HBox.margin>
@@ -44,9 +42,9 @@
                   </Button>
                </children>
             </HBox>
-            <HBox prefHeight="319.0" prefWidth="584.0">
+            <HBox>
                <children>
-                  <VBox prefHeight="450.0" prefWidth="197.0">
+                  <VBox fx:id="colorStuff">
                      <children>
                         <TextArea fx:id="userfield" editable="false" prefHeight="220.0">
                            <padding>
@@ -57,51 +55,32 @@
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin></Label>
-                        <GridPane>
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Red" />
-                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Orange" GridPane.columnIndex="1" />
-                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Yellow" GridPane.rowIndex="1" />
-                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Green" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Button defaultButton="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Blue" GridPane.rowIndex="2" />
-                              <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Pink" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                           </children>
-                        </GridPane>
-                        <Button mnemonicParsing="false" prefWidth="200.0" text="Erase">
+                        <ColorPicker fx:id="colorChooser" prefWidth="200.0" />
+                        <Button minWidth="-Infinity" mnemonicParsing="false" prefWidth="200.0" text="Erase">
                            <VBox.margin>
                               <Insets top="5.0" />
                            </VBox.margin>
                         </Button>
                      </children>
                   </VBox>
-                  <Canvas height="450.0" width="600.0">
-                     <effect>
-                        <ImageInput>
-                           <source>
-                              <Image url="@FramePainting.jpg" />
-                           </source>
-                        </ImageInput>
-                     </effect>
-                  </Canvas>
+                  <Pane fx:id="drawingArea" minHeight="-Infinity" minWidth="-Infinity" prefHeight="299.0" prefWidth="400.0">
+                     <children>
+                        <ImageView fitHeight="300.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@resources/FramePainting.png" />
+                           </image>
+                        </ImageView>
+                     </children></Pane>
                </children>
             </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <HBox>
                <children>
                   <Label alignment="CENTER" text="Ink:">
                      <HBox.margin>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                        <Insets />
                      </HBox.margin>
                   </Label>
-                  <ProgressBar prefHeight="74.0" prefWidth="699.0" progress="0.0">
+                  <ProgressBar fx:id="inkRemaining" prefWidth="582.0" progress="1.0">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
