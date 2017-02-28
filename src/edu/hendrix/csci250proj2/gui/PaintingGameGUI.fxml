@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.hendrix.csci250proj2.PaintingGameController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="606.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.hendrix.csci250proj2.gui.PaintingGameController">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -37,7 +37,7 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Button fx:id="donepainting" mnemonicParsing="false" onAction="#open" text="Done Painting!">
+                  <Button fx:id="donepainting" mnemonicParsing="false" text="Done Painting!">
                      <HBox.margin>
                         <Insets top="20.0" />
                      </HBox.margin>
