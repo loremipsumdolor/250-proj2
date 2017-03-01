@@ -55,7 +55,7 @@ public class PaintingGameController {
 	private double sx;
 	private double sy;
 	private Color currentColor = Color.BLACK;
-	private double inkRemainingDubs;
+	private double inkRemainingDubs = 1.0;
 	
 	@FXML
 	private void initialize() {
@@ -88,21 +88,25 @@ public class PaintingGameController {
 	}
 	
 	public void startDrag(MouseEvent event) {
-		sx = event.getX();
-		sy = event.getY();
+		if (inkRemainingDubs != 0.005) {
+			sx = event.getX();
+			sy = event.getY();
+		}
 	}
 	
 	public void draw(MouseEvent event) {
-		double fx = event.getX();
-		double fy = event.getY();
-		Line line = new Line(sx, sy, fx, fy);
-		line.setStroke(currentColor);
-		line.setStrokeLineCap(StrokeLineCap.ROUND);
-		drawingArea.getChildren().add(line);
-		sx = fx;
-		sy = fy;
-		inkRemainingDubs -= .001;
-		inkRemaining.setProgress(inkRemainingDubs);
+		if (inkRemainingDubs >= 0.005) {
+			double fx = event.getX();
+			double fy = event.getY();
+			Line line = new Line(sx, sy, fx, fy);
+			line.setStroke(currentColor);
+			line.setStrokeLineCap(StrokeLineCap.ROUND);
+			drawingArea.getChildren().add(line);
+			sx = fx;
+			sy = fy;
+			inkRemainingDubs -= .005;
+			inkRemaining.setProgress(inkRemainingDubs);
+		}
 	}
 	
 	private void setDone() {
