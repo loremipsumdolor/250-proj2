@@ -23,7 +23,10 @@ public class socketHelper {
 	
 	public socketHelper(int portNumber) throws IOException{
 		 ServerSocket serverSocket = new ServerSocket(portNumber);
+		 while(true){
 		 this.sock = serverSocket.accept();
+		 if (this.sock != null ) break;
+		 }
 		 this.dOut = new DataOutputStream(sock.getOutputStream());
 		 this.dIn = new DataInputStream(sock.getInputStream());
 	}
