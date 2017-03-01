@@ -88,7 +88,7 @@ public class PaintingGameController {
 	}
 	
 	public void startDrag(MouseEvent event) {
-		if (inkRemainingDubs != 0.005) {
+		if (inkRemainingDubs >= 0.005) {
 			sx = event.getX();
 			sy = event.getY();
 		}
