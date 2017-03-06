@@ -35,7 +35,7 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <Button fx:id="donepainting" mnemonicParsing="false" text="Done Painting!">
+                  <Button fx:id="donePaintingButton" mnemonicParsing="false" onAction="#setDone" text="Done Painting!">
                      <HBox.margin>
                         <Insets top="20.0" />
                      </HBox.margin>
@@ -56,7 +56,7 @@
                               <Insets top="10.0" />
                            </VBox.margin></Label>
                         <ColorPicker fx:id="colorChooser" prefWidth="200.0" />
-                        <Button minWidth="-Infinity" mnemonicParsing="false" prefWidth="200.0" text="Erase">
+                        <Button fx:id="eraseButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#eraseDrawing" prefWidth="200.0" text="Erase">
                            <VBox.margin>
                               <Insets top="5.0" />
                            </VBox.margin>

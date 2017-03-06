@@ -9,6 +9,7 @@ import edu.hendrix.csci250proj2.DrawA;
 import edu.hendrix.csci250proj2.User;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -37,7 +38,9 @@ public class PaintingGameController {
 	@FXML 
 	TextArea userfield;
 	@FXML
-	Button donepainting;
+	Button eraseButton;
+	@FXML
+	Button donePaintingButton;
 	@FXML
 	Pane drawingArea;
 	@FXML
@@ -56,7 +59,8 @@ public class PaintingGameController {
 	private double sy;
 	private Color currentColor = Color.BLACK;
 	private double inkRemainingDubs = 1.0;
-	
+	private Node cleanDrawingArea;
+
 	@FXML
 	private void initialize() {
 		colorChooser.setValue(Color.BLACK);
@@ -71,6 +75,7 @@ public class PaintingGameController {
 		drawingArea.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 		drawingArea.setLayoutX(colorStuff.getWidth());
 		drawingArea.setLayoutY(drawingStuff.getHeight());
+		cleanDrawingArea = drawingArea.getChildren().get(0);
 		TextInputDialog signInDialog = new TextInputDialog();
 		signInDialog.setTitle("Painting Game");
 		signInDialog.setHeaderText("Welcome to Painting Game");
@@ -88,14 +93,14 @@ public class PaintingGameController {
 	}
 	
 	public void startDrag(MouseEvent event) {
-		if (inkRemainingDubs >= 0.005) {
+		if (inkRemainingDubs >= 0.0025) {
 			sx = event.getX();
 			sy = event.getY();
 		}
 	}
 	
 	public void draw(MouseEvent event) {
-		if (inkRemainingDubs >= 0.005) {
+		if (inkRemainingDubs >= 0.0025) {
 			double fx = event.getX();
 			double fy = event.getY();
 			Line line = new Line(sx, sy, fx, fy);
@@ -104,11 +109,20 @@ public class PaintingGameController {
 			drawingArea.getChildren().add(line);
 			sx = fx;
 			sy = fy;
-			inkRemainingDubs -= .005;
+			inkRemainingDubs -= .0025;
 			inkRemaining.setProgress(inkRemainingDubs);
 		}
 	}
 	
+	@FXML
+	public void eraseDrawing() {
+		drawingArea.getChildren().clear();
+		drawingArea.getChildren().add(cleanDrawingArea);
+		inkRemainingDubs = 1.0;
+		inkRemaining.setProgress(inkRemainingDubs);
+	}
+	
+	@FXML
 	private void setDone() {
 		user.setDone();
 		rateDrawing();
