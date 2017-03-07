@@ -54,6 +54,8 @@ public class PaintingGameController {
 	HBox drawingStuff;
 	@FXML
 	VBox colorStuff;
+	@FXML
+	Pane board;
 	
 	private User user;
 	private int rating;
@@ -76,8 +78,11 @@ public class PaintingGameController {
 		drawingArea.setOnMouseDragged(event -> draw(event));
 		drawingArea.setOnMousePressed(event -> startDrag(event));
 		drawingArea.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-		drawingArea.setLayoutX(colorStuff.getWidth());
-		drawingArea.setLayoutY(drawingStuff.getHeight());
+		
+		//Edited so things wouldn't draw everywhere
+		drawingArea.setLayoutX(colorStuff.getHeight());
+		drawingArea.setLayoutY(drawingStuff.getWidth());
+		
 		cleanDrawingArea = drawingArea.getChildren().get(0);
 		TextInputDialog signInDialog = new TextInputDialog();
 		signInDialog.setTitle("Painting Game");
@@ -110,17 +115,20 @@ public class PaintingGameController {
 	}
 	
 	public void draw(MouseEvent event) {
+		//Edited so it doesn't draw everywhere
 		if (inkRemainingDubs >= 0.0025) {
 			double fx = event.getX();
 			double fy = event.getY();
-			Line line = new Line(sx, sy, fx, fy);
-			line.setStroke(currentColor);
-			line.setStrokeLineCap(StrokeLineCap.ROUND);
-			drawingArea.getChildren().add(line);
-			sx = fx;
-			sy = fy;
-			inkRemainingDubs -= .0025;
-			inkRemaining.setProgress(inkRemainingDubs);
+			if (fx > 50 && fx < 600 && fy > 50 && fy < 430) {
+				Line line = new Line(sx, sy, fx, fy);
+				line.setStroke(currentColor);
+				line.setStrokeLineCap(StrokeLineCap.ROUND);
+				drawingArea.getChildren().add(line);
+				sx = fx;
+				sy = fy;
+				inkRemainingDubs -= .0025;
+				inkRemaining.setProgress(inkRemainingDubs);
+			}
 		}
 	}
 	
