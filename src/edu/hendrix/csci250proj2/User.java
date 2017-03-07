@@ -1,7 +1,5 @@
 package edu.hendrix.csci250proj2;
 
-// This is a test comment.
-
 public class User {
 	
 	/*

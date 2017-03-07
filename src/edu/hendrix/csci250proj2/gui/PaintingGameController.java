@@ -1,11 +1,13 @@
 package edu.hendrix.csci250proj2.gui;
 
 import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import edu.hendrix.csci250proj2.DrawA;
+import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -31,6 +33,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.control.ProgressBar;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.TextField;
 
 public class PaintingGameController {
 	@FXML
@@ -44,7 +47,7 @@ public class PaintingGameController {
 	@FXML
 	Pane drawingArea;
 	@FXML
-	Label drawingPrompt;
+	TextField drawingPrompt;
 	@FXML
 	ProgressBar inkRemaining;
 	@FXML
@@ -83,13 +86,20 @@ public class PaintingGameController {
 		Optional<String> result = signInDialog.showAndWait();
 		if (result.isPresent()){
 		    user = new User(result.get());
+		    System.out.println(user.getName());
+		}else {
+			user = new User("User1"); 
 		}
 		try {
-			ArrayList<String> potentialDrawings = DrawA.readFile();
-			drawingPrompt.setText(potentialDrawings.get(ThreadLocalRandom.current().nextInt(potentialDrawings.size())));
+			String prompt = DrawSelect.initialize();
+			drawingPrompt.setText(prompt);
 		} catch (Exception exc) {
 			outputMessage(exc.getMessage(), AlertType.ERROR);
 		}
+		String username = user.getName();
+		userfield.appendText(username);
+		//This also needs to be sent to the opponent to append and vice versa
+		userfield.setEditable(false);
 	}
 	
 	public void startDrag(MouseEvent event) {
