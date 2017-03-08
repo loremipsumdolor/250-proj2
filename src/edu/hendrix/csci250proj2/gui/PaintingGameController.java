@@ -55,7 +55,7 @@ public class PaintingGameController {
 	@FXML
 	Pane drawingArea;
 	@FXML
-	Label drawingPrompt;
+	TextField drawingPrompt;
 	@FXML
 	ProgressBar inkRemaining;
 	@FXML

@@ -1,5 +1,5 @@
 package edu.hendrix.csci250proj2;
-
+/*
 import static org.junit.Assert.*;
 
 
@@ -34,3 +34,4 @@ public class Testing {
 	}
 
 }
+*/
