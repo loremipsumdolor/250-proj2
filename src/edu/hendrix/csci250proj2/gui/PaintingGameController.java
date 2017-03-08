@@ -168,6 +168,7 @@ public class PaintingGameController {
 		} else {
 			starText = "stars";
 		}
-		matchEndAlert.setContentText("You earned " + Integer.toString(otherRating) + " " + starText);
+		matchEndAlert.setContentText("You earned " + Integer.toString(otherRating) + " " + starText + ".");
+		matchEndAlert.showAndWait();
 	}
 }
