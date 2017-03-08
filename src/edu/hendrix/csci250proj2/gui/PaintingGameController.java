@@ -9,6 +9,7 @@ import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -17,6 +18,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -38,9 +40,11 @@ public class PaintingGameController {
 	@FXML 
 	TextArea userfield;
 	@FXML
-	Button eraseButton;
+	Button clearButton;
 	@FXML
 	Button donePaintingButton;
+	@FXML
+	ToggleButton eraseButton;
 	@FXML
 	Pane drawingArea;
 	@FXML
@@ -70,6 +74,7 @@ public class PaintingGameController {
 			@Override
 			public void handle(ActionEvent event) {
 				currentColor = colorChooser.getValue();
+				eraseButton.setSelected(false);
 			}
 		});
 		drawingArea.setOnMouseDragged(event -> draw(event));
@@ -77,6 +82,7 @@ public class PaintingGameController {
 		drawingArea.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 		drawingArea.setLayoutX(colorStuff.getHeight());
 		drawingArea.setLayoutY(drawingStuff.getWidth());
+		
 		cleanDrawingArea = drawingArea.getChildren().get(0);
 		TextInputDialog signInDialog = new TextInputDialog();
 		signInDialog.setTitle("Painting Game");
@@ -114,26 +120,47 @@ public class PaintingGameController {
 			double fx = event.getX();
 			double fy = event.getY();
 			if (fx > 62 && fx < 590 && fy > 65 && fy < 426) {
-				Line line = new Line(sx, sy, fx, fy);
-				line.setStroke(currentColor);
-				line.setStrokeLineCap(StrokeLineCap.ROUND);
-				drawingArea.getChildren().add(line);
-				sx = fx;
-				sy = fy;
-				inkRemainingDubs -= .0025;
-				inkRemaining.setProgress(inkRemainingDubs);
+				if (!eraseButton.isSelected()) {
+					Line line = new Line(sx, sy, fx, fy);
+					line.setStroke(currentColor);
+					line.setStrokeLineCap(StrokeLineCap.ROUND);
+					drawingArea.getChildren().add(line);
+					sx = fx;
+					sy = fy;
+					inkRemainingDubs -= .001;
+					inkRemaining.setProgress(inkRemainingDubs);
+				} else if (eraseButton.isSelected() && fx > 72 && fx < 580 && fy > 75 && fy < 416) {
+					Line line = new Line(sx, sy, fx, fy);
+					line.setStroke(currentColor);
+					line.setStrokeLineCap(StrokeLineCap.ROUND);
+					line.setStrokeWidth(20.0);
+					drawingArea.getChildren().add(line);
+					sx = fx;
+					sy = fy;
+				}
 			}
 		}
 	}
 	
 	@FXML
-	public void eraseDrawing() {
+	public void clearDrawing() {
 		drawingArea.getChildren().clear();
 		drawingArea.getChildren().add(cleanDrawingArea);
 		inkRemainingDubs = 1.0;
 		inkRemaining.setProgress(inkRemainingDubs);
 	}
 	
+	@FXML
+	private void eraseDrawing() {
+		if (eraseButton.isSelected()) {
+			currentColor = Color.WHITE;
+			
+		} else {
+			currentColor = colorChooser.getValue();
+		}
+		
+	}
+
 	@FXML
 	private void setDone() {
 		user.setDone();
