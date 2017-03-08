@@ -91,7 +91,6 @@ public class PaintingGameController {
 		Optional<String> result = signInDialog.showAndWait();
 		if (result.isPresent()){
 		    user = new User(result.get());
-		    System.out.println(user.getName());
 		}else {
 			user = new User("User1"); 
 		}
