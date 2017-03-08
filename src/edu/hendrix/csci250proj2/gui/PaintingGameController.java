@@ -2,17 +2,19 @@ package edu.hendrix.csci250proj2.gui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
-import edu.hendrix.csci250proj2.DrawA;
+import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
 import edu.hendrix.csci250proj2.network.socketHelper;
 import edu.hendrix.csci250proj2.network.socketState;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -23,7 +25,9 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -36,6 +40,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.control.ProgressBar;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.TextField;
 
 public class PaintingGameController {
 	@FXML
@@ -43,7 +48,10 @@ public class PaintingGameController {
 	@FXML 
 	TextArea userfield;
 	@FXML
-	Button donepainting;
+	Button donePainting;
+	Button clearButton;
+	@FXML
+	ToggleButton eraseButton;
 	@FXML
 	Pane drawingArea;
 	@FXML
@@ -54,6 +62,8 @@ public class PaintingGameController {
 	HBox drawingStuff;
 	@FXML
 	VBox colorStuff;
+	@FXML
+	Pane board;
 	
 	//Users
 	private User user;
@@ -80,6 +90,8 @@ public class PaintingGameController {
     private Thread setupThread;
 	
 	
+	private Node cleanDrawingArea;
+
 	@FXML
 	private void initialize() {
 		colorChooser.setValue(Color.BLACK);
@@ -87,13 +99,16 @@ public class PaintingGameController {
 			@Override
 			public void handle(ActionEvent event) {
 				currentColor = colorChooser.getValue();
+				eraseButton.setSelected(false);
 			}
 		});
 		drawingArea.setOnMouseDragged(event -> draw(event));
 		drawingArea.setOnMousePressed(event -> startDrag(event));
 		drawingArea.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-		drawingArea.setLayoutX(colorStuff.getWidth());
-		drawingArea.setLayoutY(drawingStuff.getHeight());
+		drawingArea.setLayoutX(colorStuff.getHeight());
+		drawingArea.setLayoutY(drawingStuff.getWidth());
+		
+		cleanDrawingArea = drawingArea.getChildren().get(0);
 		TextInputDialog signInDialog = new TextInputDialog();
 		signInDialog.setTitle("Painting Game");
 		signInDialog.setHeaderText("Welcome to Painting Game");
@@ -101,10 +116,11 @@ public class PaintingGameController {
 		Optional<String> result = signInDialog.showAndWait();
 		if (result.isPresent()){
 		    user = new User(result.get());
+		}else {
+			user = new User("User1"); 
 		}
 		try {
-			potentialDrawings = DrawA.readFile();
-			currentPrompt = potentialDrawings.get(ThreadLocalRandom.current().nextInt(potentialDrawings.size()));
+			currentPrompt = DrawSelect.initialize();
 		} catch (Exception exc) {
 			outputMessage(exc.getMessage(), AlertType.ERROR);
 		}
@@ -195,7 +211,7 @@ public class PaintingGameController {
 	}
     
 	public void startDrag(MouseEvent event) {
-		if (inkRemainingDubs >= 0.005) {
+		if (inkRemainingDubs >= 0.0025) {
 			sx = event.getX();
 			sy = event.getY();
 		}
@@ -203,6 +219,8 @@ public class PaintingGameController {
 	
 	public void draw(MouseEvent event) {
 		if (inkRemainingDubs >= 0.005) {
+		//Edited so it doesn't draw everywhere
+		if (inkRemainingDubs >= 0.0025) {
 			double fx = event.getX();
 			double fy = event.getY();
 			Line line = new Line(sx, sy, fx, fy);
@@ -213,9 +231,50 @@ public class PaintingGameController {
 			sy = fy;
 			inkRemainingDubs -= .005;
 			inkRemaining.setProgress(inkRemainingDubs);
+			if (fx > 62 && fx < 590 && fy > 65 && fy < 426) {
+				if (!eraseButton.isSelected()) {
+					Line line1 = new Line(sx, sy, fx, fy);
+					line1.setStroke(currentColor);
+					line1.setStrokeLineCap(StrokeLineCap.ROUND);
+					drawingArea.getChildren().add(line1);
+					sx = fx;
+					sy = fy;
+					inkRemainingDubs -= .001;
+					inkRemaining.setProgress(inkRemainingDubs);
+				} else if (eraseButton.isSelected() && fx > 72 && fx < 580 && fy > 75 && fy < 416) {
+					Line line1 = new Line(sx, sy, fx, fy);
+					line1.setStroke(currentColor);
+					line1.setStrokeLineCap(StrokeLineCap.ROUND);
+					line1.setStrokeWidth(20.0);
+					drawingArea.getChildren().add(line1);
+					sx = fx;
+					sy = fy;
+					}
+				}
+			}
 		}
 	}
 	
+	@FXML
+	public void clearDrawing() {
+		drawingArea.getChildren().clear();
+		drawingArea.getChildren().add(cleanDrawingArea);
+		inkRemainingDubs = 1.0;
+		inkRemaining.setProgress(inkRemainingDubs);
+	}
+	
+	@FXML
+	private void eraseDrawing() {
+		if (eraseButton.isSelected()) {
+			currentColor = Color.WHITE;
+			
+		} else {
+			currentColor = colorChooser.getValue();
+		}
+		
+	}
+
+	@FXML
 	private void setDone() {
 		user.setDone();
 		rateDrawing();
@@ -249,7 +308,8 @@ public class PaintingGameController {
 		} else {
 			starText = "stars";
 		}
-		matchEndAlert.setContentText("You earned " + Integer.toString(otherRating) + " " + starText);
+		matchEndAlert.setContentText("You earned " + Integer.toString(otherRating) + " " + starText + ".");
+		matchEndAlert.showAndWait();
 	}
 	
 	/*
