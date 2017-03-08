@@ -1,17 +1,23 @@
 package edu.hendrix.csci250proj2.gui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import edu.hendrix.csci250proj2.DrawA;
 import edu.hendrix.csci250proj2.User;
+import edu.hendrix.csci250proj2.network.socketHelper;
+import edu.hendrix.csci250proj2.network.socketState;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -49,13 +55,30 @@ public class PaintingGameController {
 	@FXML
 	VBox colorStuff;
 	
+	//Users
 	private User user;
+	private User user2;
 	private int rating;
 	private int otherRating;
+	
+	//Drawing
 	private double sx;
 	private double sy;
 	private Color currentColor = Color.BLACK;
 	private double inkRemainingDubs = 1.0;
+    private boolean ready = false;
+    
+    //Prompts
+    ArrayList<String> potentialDrawings;
+    String currentPrompt;
+    
+    //Networking
+    private boolean isHost = false;
+	private socketHelper player2;
+	private boolean connection;
+    private Thread socketReaderThread;
+    private Thread setupThread;
+	
 	
 	@FXML
 	private void initialize() {
@@ -80,13 +103,97 @@ public class PaintingGameController {
 		    user = new User(result.get());
 		}
 		try {
-			ArrayList<String> potentialDrawings = DrawA.readFile();
-			drawingPrompt.setText(potentialDrawings.get(ThreadLocalRandom.current().nextInt(potentialDrawings.size())));
+			potentialDrawings = DrawA.readFile();
+			currentPrompt = potentialDrawings.get(ThreadLocalRandom.current().nextInt(potentialDrawings.size()));
 		} catch (Exception exc) {
 			outputMessage(exc.getMessage(), AlertType.ERROR);
 		}
+        
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Host or User");
+		alert.setHeaderText("Choose to be the Host or the User");
+		alert.setContentText("Choose your option.");
+
+		ButtonType buttonTypeOne = new ButtonType("Host");
+		ButtonType buttonTypeTwo = new ButtonType("User");
+		ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+		alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+
+		Optional<ButtonType> Bresult = alert.showAndWait();
+		if (Bresult.get() == buttonTypeOne){
+			startHost();
+		} else if (Bresult.get() == buttonTypeTwo) {
+		    startUser();
+		} else {
+		    // ... user chose CANCEL or closed the dialog
+		}
 	}
 	
+    public void startUser(){
+    	//CONNECTION SCREEN
+		TextInputDialog tryConnectionDialog = new TextInputDialog();
+		tryConnectionDialog.setTitle("Painting Game");
+		tryConnectionDialog.setHeaderText("Painting Game Setup");
+		tryConnectionDialog.setContentText("Please enter IP of the other player:");
+				
+		while(!ready){//Connection Loop if a connection isn't made the first try		
+					
+    		Optional<String> IPresult = tryConnectionDialog.showAndWait();
+    		try{
+    				player2 = new socketHelper(IPresult.get(),3002);
+    				player2.writeString(user.getName());
+    				notifyReady();
+    				
+    		}catch(IOException | NoSuchElementException e){//Catch an IO Error
+    				if(IPresult.isPresent() && e.getMessage() == IPresult.get()){
+    						outputMessage("Invalid Address!", AlertType.ERROR);
+    				}else{
+    						outputMessage(e.toString(), AlertType.ERROR);
+    				}
+    		}
+		}
+		
+    	try {
+            waitForReady();
+            /*
+             * Background thread to continuously read from the input stream.
+             */
+            socketReaderThread = new SocketReaderThread();
+            socketReaderThread.start();
+            outputMessage("Userin it", AlertType.INFORMATION);
+        } catch (Exception e) {
+        	outputMessage(e.getMessage(), AlertType.INFORMATION);
+        }
+	}
+	
+	public void startHost(){
+		//CONNECTION SCREEN
+		isHost = true;
+		drawingPrompt.setText(currentPrompt);
+		try {
+            /*
+             * Background thread to set up and open the input and
+             * output data streams.
+             */
+            setupThread = new SetupServerThread();
+            setupThread.start();
+            
+            waitForReady();
+            /*
+             * Background thread to continuously read from the input stream.
+             */
+            socketReaderThread = new SocketReaderThread();
+            socketReaderThread.start();
+            outputMessage("Hostin it", AlertType.INFORMATION);
+        } catch (Exception e) {
+        	outputMessage(e.getMessage(), AlertType.INFORMATION);
+        }  
+		
+		
+		
+	}
+    
 	public void startDrag(MouseEvent event) {
 		if (inkRemainingDubs >= 0.005) {
 			sx = event.getX();
@@ -144,4 +251,142 @@ public class PaintingGameController {
 		}
 		matchEndAlert.setContentText("You earned " + Integer.toString(otherRating) + " " + starText);
 	}
+	
+	/*
+     * Synchronized method set up to wait until the SetupThread is
+     * sufficiently initialized.  When notifyReady() is called, waiting
+     * will cease.
+     */
+    private synchronized void waitForReady() {
+        while (!ready) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
+    /*
+     * Synchronized method responsible for notifying waitForReady()
+     * method that it's OK to stop waiting.
+     */
+    private synchronized void notifyReady() {
+        ready = true;
+        //outputMessage("Successfully Connected!", AlertType.INFORMATION);
+        notifyAll();
+    }
+    
+    /**
+     * Called whenever the open/closed status of the Socket
+     * changes.  In JavaFX, this method must be run on the main thread and is
+     * accomplished by the Platform.runLater() call.  Failure to do so
+     * *will* result in strange errors and exceptions.
+     * @param isClosed true if the socket is closed
+     */
+    /*
+    public void onClosedStatus(final boolean isClosed) {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                //fxListener.onClosedStatus(isClosed);
+            	if(!isClosed){
+            		connection = true;
+            	}else{
+            		connection = false;
+            	}
+            }
+        });
+    }*/
+    
+    public void promptReady() {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	drawingPrompt.setText(currentPrompt);
+            }
+        });
+    }
+    
+    public void madeIT(String It) {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	outputMessage(It, AlertType.INFORMATION);
+            }
+        });
+    }
+    
+    class SetupServerThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+            	player2 = new socketHelper(3002);
+            	player2.writeString(user.getName());
+                /*
+                 * Notify SocketReaderThread that it can now start.
+                 */
+                notifyReady();
+            } catch (IOException e) {
+                    //outputMessage("Waiting on User", AlertType.ERROR);
+            	System.out.println(e.getMessage());
+                /*
+                 * This will notify the SocketReaderThread that it should exit.
+                 */
+                notifyReady();
+            }
+        }
+    }
+
+    class SocketReaderThread extends Thread {
+
+        @Override
+        public void run() {
+            /*
+             * Wait until the socket is set up before beginning to read.
+             */
+        	/////FOUR SOCKET STATES
+        	while(true)
+        	{
+        		//USERNAME
+        		if(player2.getState() == socketState.USERNAME)
+        		{
+        			try {
+							user2 = new User(player2.readNextString());
+							player2.setState(socketState.DRAWING);
+							if(isHost){
+								player2.writeString(currentPrompt);
+							}
+					} catch (IOException e) {
+						System.out.println(e.getMessage());
+					}
+        		//PROMPT EXCHANGE
+        		}else if(player2.getState() == socketState.DRAWING){
+        			try {
+						if(!isHost){
+							currentPrompt = player2.readNextString();
+							promptReady();
+							player2.setState(socketState.COLOR);
+						}else{
+							player2.setState(socketState.COLOR);
+							
+						}
+						
+        			} catch (IOException e) {
+        				System.out.println(e.getMessage());
+        			}
+        		//COLOR EXCHANGE
+        		}else if(player2.getState() == socketState.COLOR){
+        			
+        		//SCORE EXCHANGE
+        		}else if(player2.getState() == socketState.SCORE){
+        			
+        		}	
+            }
+        }
+    }
+
+	
 }
+
+
