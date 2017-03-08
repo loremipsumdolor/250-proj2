@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
-import edu.hendrix.csci250proj2.DrawA;
 import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
 import javafx.fxml.FXML;
@@ -17,7 +15,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
@@ -78,11 +75,8 @@ public class PaintingGameController {
 		drawingArea.setOnMouseDragged(event -> draw(event));
 		drawingArea.setOnMousePressed(event -> startDrag(event));
 		drawingArea.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-		
-		//Edited so things wouldn't draw everywhere
 		drawingArea.setLayoutX(colorStuff.getHeight());
 		drawingArea.setLayoutY(drawingStuff.getWidth());
-		
 		cleanDrawingArea = drawingArea.getChildren().get(0);
 		TextInputDialog signInDialog = new TextInputDialog();
 		signInDialog.setTitle("Painting Game");
@@ -119,7 +113,7 @@ public class PaintingGameController {
 		if (inkRemainingDubs >= 0.0025) {
 			double fx = event.getX();
 			double fy = event.getY();
-			if (fx > 50 && fx < 600 && fy > 50 && fy < 430) {
+			if (fx > 62 && fx < 590 && fy > 65 && fy < 426) {
 				Line line = new Line(sx, sy, fx, fy);
 				line.setStroke(currentColor);
 				line.setStrokeLineCap(StrokeLineCap.ROUND);
