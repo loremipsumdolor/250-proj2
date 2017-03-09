@@ -1,4 +1,4 @@
-package edu.hendrix.csci250proj2.network;
+ package edu.hendrix.csci250proj2.network;
 
 import java.io.IOException;
 import java.io.PrintWriter;

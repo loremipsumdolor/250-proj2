@@ -1,10 +1,13 @@
 package edu.hendrix.csci250proj2;
-/*
+
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 import org.junit.Test;
 
+import edu.hendrix.csci250proj2.network.socketHelper;
 import javafx.scene.control.Alert.AlertType;
 
 public class Testing {
@@ -32,6 +35,21 @@ public class Testing {
 		chantal.setDone();
 		assertEquals(chantal.isDone(), true);
 	}
+	
+	@Test
+	public void testsocketHelper() {
+		//Checks creation
+		try {
+			socketHelper socket = new socketHelper("10.253.200.180", 3002);
+			//Test getState()
+			
+			//Test colorConstruct
+		
+		
+		} catch (IOException e) {
+			fail("Invalid IP");
+		}
+		
+	}
 
 }
-*/
