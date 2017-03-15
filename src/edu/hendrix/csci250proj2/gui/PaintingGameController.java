@@ -10,11 +10,8 @@ import java.util.Optional;
 
 import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
-<<<<<<< HEAD
-=======
 import edu.hendrix.csci250proj2.network.socketHelper;
 import edu.hendrix.csci250proj2.network.socketState;
->>>>>>> parent of 6aafdc5... Presentation Time
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -82,14 +79,8 @@ public class PaintingGameController {
     
     //Networking
     private boolean isHost = false;
-<<<<<<< HEAD
-=======
 	private socketHelper player2;
 	private boolean connection;
-<<<<<<< HEAD
->>>>>>> parent of 6aafdc5... Presentation Time
-=======
->>>>>>> parent of 6aafdc5... Presentation Time
     private Thread socketReaderThread;
     private Thread setupThread;
 	
@@ -158,15 +149,9 @@ public class PaintingGameController {
             /*
              * Background thread to continuously read from the input stream.
              */
-<<<<<<< HEAD
-=======
             socketReaderThread = new SocketReaderThread();
             socketReaderThread.start();
             outputMessage("Userin it", AlertType.INFORMATION);
-<<<<<<< HEAD
->>>>>>> parent of 6aafdc5... Presentation Time
-=======
->>>>>>> parent of 6aafdc5... Presentation Time
         } catch (Exception e) {
         	outputMessage(e.getMessage(), AlertType.INFORMATION);
         }
@@ -178,11 +163,9 @@ public class PaintingGameController {
 		drawingPrompt.setText(currentPrompt);
 		try {
             /*
-<<<<<<< HEAD
 			 * Notify SocketReaderThread that it can now start.
 			 */
 			notifyReady();
-=======
              * Background thread to set up and open the input and
              * output data streams.
              */
@@ -196,10 +179,6 @@ public class PaintingGameController {
             socketReaderThread = new SocketReaderThread();
             socketReaderThread.start();
             outputMessage("Hostin it", AlertType.INFORMATION);
-<<<<<<< HEAD
->>>>>>> parent of 6aafdc5... Presentation Time
-=======
->>>>>>> parent of 6aafdc5... Presentation Time
         } catch (Exception e) {
         	outputMessage(e.getMessage(), AlertType.INFORMATION);
         }  
@@ -252,14 +231,6 @@ public class PaintingGameController {
 			}
 		}
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-=======
->>>>>>> parent of 6aafdc5... Presentation Time
-	
->>>>>>> parent of 6aafdc5... Presentation Time
 	@FXML
 	public void clearDrawing() {
 		drawingArea.getChildren().clear();
@@ -377,11 +348,6 @@ public class PaintingGameController {
         });
     }
     
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 6aafdc5... Presentation Time
     class SetupServerThread extends Thread {
 
         @Override
