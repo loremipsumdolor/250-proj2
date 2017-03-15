@@ -10,6 +10,11 @@ import java.util.Optional;
 
 import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
+<<<<<<< HEAD
+=======
+import edu.hendrix.csci250proj2.network.socketHelper;
+import edu.hendrix.csci250proj2.network.socketState;
+>>>>>>> parent of 6aafdc5... Presentation Time
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -77,6 +82,11 @@ public class PaintingGameController {
     
     //Networking
     private boolean isHost = false;
+<<<<<<< HEAD
+=======
+	private socketHelper player2;
+	private boolean connection;
+>>>>>>> parent of 6aafdc5... Presentation Time
     private Thread socketReaderThread;
     private Thread setupThread;
 	
@@ -141,11 +151,18 @@ public class PaintingGameController {
 		}
 		
     	try {
+            waitForReady();
             /*
              * Background thread to continuously read from the input stream.
              */
+<<<<<<< HEAD
+=======
+            socketReaderThread = new SocketReaderThread();
+            socketReaderThread.start();
+            outputMessage("Userin it", AlertType.INFORMATION);
+>>>>>>> parent of 6aafdc5... Presentation Time
         } catch (Exception e) {
-        	outputMessage("Socket Reader Error" + e.getMessage(), AlertType.INFORMATION);
+        	outputMessage(e.getMessage(), AlertType.INFORMATION);
         }
 	}
 	
@@ -155,12 +172,27 @@ public class PaintingGameController {
 		drawingPrompt.setText(currentPrompt);
 		try {
             /*
+<<<<<<< HEAD
 			 * Notify SocketReaderThread that it can now start.
 			 */
 			notifyReady();
+=======
+             * Background thread to set up and open the input and
+             * output data streams.
+             */
+            setupThread = new SetupServerThread();
+            setupThread.start();
+            
+            waitForReady();
+            /*
+             * Background thread to continuously read from the input stream.
+             */
+            socketReaderThread = new SocketReaderThread();
+            socketReaderThread.start();
+            outputMessage("Hostin it", AlertType.INFORMATION);
+>>>>>>> parent of 6aafdc5... Presentation Time
         } catch (Exception e) {
-        	e.printStackTrace();
-        	outputMessage("Socket Reader Error: ", AlertType.INFORMATION);
+        	outputMessage(e.getMessage(), AlertType.INFORMATION);
         }  
 		
 		
@@ -211,14 +243,17 @@ public class PaintingGameController {
 			}
 		}
 	}
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> parent of 6aafdc5... Presentation Time
 	@FXML
 	public void clearDrawing() {
 		drawingArea.getChildren().clear();
 		drawingArea.getChildren().add(cleanDrawingArea);
 		inkRemainingDubs = 1.0;
 		inkRemaining.setProgress(inkRemainingDubs);
-		
 	}
 	
 	@FXML
@@ -243,7 +278,6 @@ public class PaintingGameController {
 		Alert alert = new Alert(alertType, message);
 		alert.showAndWait();
 	}
-	
 	
 	public void rateDrawing() {
 		ArrayList<String> ratings = new ArrayList<>(Arrays.asList("0", "1", "2", "3", "4", "5"));
@@ -313,11 +347,11 @@ public class PaintingGameController {
         });
     }*/
     
-    public void promptReady(String promptText) {
+    public void promptReady() {
         javafx.application.Platform.runLater(new Runnable() {
             @Override
             public void run() {
-            	drawingPrompt.setText(promptText);
+            	drawingPrompt.setText(currentPrompt);
             }
         });
     }
@@ -326,9 +360,83 @@ public class PaintingGameController {
         javafx.application.Platform.runLater(new Runnable() {
             @Override
             public void run() {
-            	outputMessage("Made It: " + It, AlertType.INFORMATION);
+            	outputMessage(It, AlertType.INFORMATION);
             }
         });
     }
     
+<<<<<<< HEAD
+=======
+    class SetupServerThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+            	player2 = new socketHelper(3002);
+            	player2.writeString(user.getName());
+                /*
+                 * Notify SocketReaderThread that it can now start.
+                 */
+                notifyReady();
+            } catch (IOException e) {
+                    //outputMessage("Waiting on User", AlertType.ERROR);
+            	System.out.println(e.getMessage());
+                /*
+                 * This will notify the SocketReaderThread that it should exit.
+                 */
+                notifyReady();
+            }
+        }
+    }
+
+    class SocketReaderThread extends Thread {
+
+        @Override
+        public void run() {
+            /*
+             * Wait until the socket is set up before beginning to read.
+             */
+        	/////FOUR SOCKET STATES
+        	while(true)
+        	{
+        		//USERNAME
+        		if(player2.getState() == socketState.USERNAME)
+        		{
+        			try {
+							user2 = new User(player2.readNextString());
+							player2.setState(socketState.DRAWING);
+							if(isHost){
+								player2.writeString(currentPrompt);
+							}
+					} catch (IOException e) {
+						System.out.println(e.getMessage());
+					}
+        		//PROMPT EXCHANGE
+        		}else if(player2.getState() == socketState.DRAWING){
+        			try {
+						if(!isHost){
+							currentPrompt = player2.readNextString();
+							promptReady();
+							player2.setState(socketState.COLOR);
+						}else{
+							player2.setState(socketState.COLOR);
+							
+						}
+						
+        			} catch (IOException e) {
+        				System.out.println(e.getMessage());
+        			}
+        		//COLOR EXCHANGE
+        		}else if(player2.getState() == socketState.COLOR){
+        			
+        		//SCORE EXCHANGE
+        		}else if(player2.getState() == socketState.SCORE){
+        			
+        		}	
+            }
+        }
+    }
+
+	
+>>>>>>> parent of 6aafdc5... Presentation Time
 }
