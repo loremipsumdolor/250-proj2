@@ -1,15 +1,17 @@
 package edu.hendrix.csci250proj2;
-
+/*
 import static org.junit.Assert.*;
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+=======
+>>>>>>> parent of 4421185... Test Cases Started
 
 import org.junit.Test;
 
-import edu.hendrix.csci250proj2.network.socketHelper;
 import javafx.scene.control.Alert.AlertType;
 
 public class Testing {
@@ -40,6 +42,7 @@ public class Testing {
 		chantal.setDone();
 		assertEquals(chantal.isDone(), true);
 	}
+<<<<<<< HEAD
 	
 	@Test
 	public void testsocketHelper() throws IOException{
@@ -65,3 +68,8 @@ public class Testing {
 	//Test your client code who will contact local host with whatever your port number is
 	//Then just do your test, test your things sent equals the thing you received
 
+=======
+
+}
+*/
+>>>>>>> parent of 4421185... Test Cases Started
