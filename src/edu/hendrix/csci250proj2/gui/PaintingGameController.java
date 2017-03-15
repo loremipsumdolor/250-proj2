@@ -231,6 +231,10 @@ public class PaintingGameController {
 			}
 		}
 	}
+<<<<<<< HEAD
+=======
+	
+>>>>>>> parent of 6aafdc5... Presentation Time
 	@FXML
 	public void clearDrawing() {
 		drawingArea.getChildren().clear();
