@@ -1,7 +1,6 @@
 package edu.hendrix.csci250proj2.gui;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 
 import java.util.Arrays;
@@ -19,6 +18,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -64,9 +65,13 @@ public class PaintingGameController {
 	@FXML
 	Pane board;
 	
+	//Users
 	private User user;
+	private User user2;
 	private int rating;
 	private int otherRating;
+	
+	//Drawing
 	private double sx;
 	private double sy;
 	private Color currentColor = Color.BLACK;
@@ -80,7 +85,6 @@ public class PaintingGameController {
     //Networking
     private boolean isHost = false;
 	private socketHelper player2;
-	private boolean connection;
     private Thread socketReaderThread;
     private Thread setupThread;
 	
@@ -119,6 +123,26 @@ public class PaintingGameController {
 		} catch (Exception exc) {
 			outputMessage(exc.getMessage(), AlertType.ERROR);
 		}
+        
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Host or User");
+		alert.setHeaderText("Choose to be the Host or the User");
+		alert.setContentText("Choose your option.");
+
+		ButtonType buttonTypeOne = new ButtonType("Host");
+		ButtonType buttonTypeTwo = new ButtonType("User");
+		ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+		alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+
+		Optional<ButtonType> Bresult = alert.showAndWait();
+		if (Bresult.get() == buttonTypeOne){
+			startHost();
+		} else if (Bresult.get() == buttonTypeTwo) {
+		    startUser();
+		} else {
+		    // ... user chose CANCEL or closed the dialog
+		}
 	}
 	
     public void startUser(){
@@ -132,10 +156,11 @@ public class PaintingGameController {
 					
     		Optional<String> IPresult = tryConnectionDialog.showAndWait();
     		try{
-
+    				player2 = new socketHelper(IPresult.get(),3002);
+    				player2.writeString(user.getName());
     				notifyReady();
     				
-    		}catch(NoSuchElementException e){
+    		}catch(IOException | NoSuchElementException e){//Catch an IO Error
     				if(IPresult.isPresent() && e.getMessage() == IPresult.get()){
     						outputMessage("Invalid Address!", AlertType.ERROR);
     				}else{
@@ -145,15 +170,13 @@ public class PaintingGameController {
 		}
 		
     	try {
-            waitForReady();
             /*
              * Background thread to continuously read from the input stream.
              */
             socketReaderThread = new SocketReaderThread();
             socketReaderThread.start();
-            outputMessage("Userin it", AlertType.INFORMATION);
         } catch (Exception e) {
-        	outputMessage(e.getMessage(), AlertType.INFORMATION);
+        	outputMessage("Socket Reader Error" + e.getMessage(), AlertType.INFORMATION);
         }
 	}
 	
@@ -163,24 +186,31 @@ public class PaintingGameController {
 		drawingPrompt.setText(currentPrompt);
 		try {
             /*
-			 * Notify SocketReaderThread that it can now start.
-			 */
-			notifyReady();
              * Background thread to set up and open the input and
              * output data streams.
              */
-            setupThread = new SetupServerThread();
-            setupThread.start();
-            
-            waitForReady();
+			try {
+            	player2 = new socketHelper(3002);
+            	player2.writeString(user.getName());
+                /*
+                 * Notify SocketReaderThread that it can now start.
+                 */
+                notifyReady();
+            } catch (IOException e) {
+                    //outputMessage("Waiting on User", AlertType.ERROR);
+            	System.out.println(e.getMessage());
+                /*
+                 * This will notify the SocketReaderThread that it should exit.
+                 */
+            }
             /*
              * Background thread to continuously read from the input stream.
              */
             socketReaderThread = new SocketReaderThread();
             socketReaderThread.start();
-            outputMessage("Hostin it", AlertType.INFORMATION);
         } catch (Exception e) {
-        	outputMessage(e.getMessage(), AlertType.INFORMATION);
+        	e.printStackTrace();
+        	outputMessage("Socket Reader Error: ", AlertType.INFORMATION);
         }  
 		
 		
@@ -231,22 +261,51 @@ public class PaintingGameController {
 			}
 		}
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 6aafdc5... Presentation Time
-=======
->>>>>>> parent of 6aafdc5... Presentation Time
+	/*
+	public void draw(double fx, double fy, int col) {
+		//Edited so it doesn't draw everywhere
+			Line line = new Line(sx, sy, fx, fy);
+			line.setStroke(new Color(col));
+			line.setStrokeLineCap(StrokeLineCap.ROUND);
+			drawingArea.getChildren().add(line);
+			sx = fx;
+			sy = fy;
+			inkRemainingDubs -= .005;
+			inkRemaining.setProgress(inkRemainingDubs);
+			if (fx > 62 && fx < 590 && fy > 65 && fy < 426) {
+				if (!eraseButton.isSelected()) {
+					Line line1 = new Line(sx, sy, fx, fy);
+					line1.setStroke(currentColor);
+					line1.setStrokeLineCap(StrokeLineCap.ROUND);
+					drawingArea.getChildren().add(line1);
+					sx = fx;
+					sy = fy;
+					inkRemainingDubs -= .001;
+					inkRemaining.setProgress(inkRemainingDubs);
+				} else if (eraseButton.isSelected() && fx > 72 && fx < 580 && fy > 75 && fy < 416) {
+					Line line1 = new Line(sx, sy, fx, fy);
+					line1.setStroke(currentColor);
+					line1.setStrokeLineCap(StrokeLineCap.ROUND);
+					line1.setStrokeWidth(20.0);
+					drawingArea.getChildren().add(line1);
+					sx = fx;
+					sy = fy;
+					}
+				}
+			}
+		}
+	}
+	*/
 	
->>>>>>> parent of 6aafdc5... Presentation Time
+	
+	
 	@FXML
 	public void clearDrawing() {
 		drawingArea.getChildren().clear();
 		drawingArea.getChildren().add(cleanDrawingArea);
 		inkRemainingDubs = 1.0;
 		inkRemaining.setProgress(inkRemainingDubs);
+		
 	}
 	
 	@FXML
@@ -272,8 +331,10 @@ public class PaintingGameController {
 		alert.showAndWait();
 	}
 	
+	
 	public void rateDrawing() {
 		ArrayList<String> ratings = new ArrayList<>(Arrays.asList("0", "1", "2", "3", "4", "5"));
+		player2.setState(socketState.SCORE);
 		ChoiceDialog<String> ratingDialog = new ChoiceDialog<>("0", ratings);
 		ratingDialog.setTitle("Painting Game");
 		ratingDialog.setHeaderText("Rate Your Opponent!");
@@ -298,7 +359,11 @@ public class PaintingGameController {
 		matchEndAlert.showAndWait();
 	}
 	
-
+	/*
+     * Synchronized method set up to wait until the SetupThread is
+     * sufficiently initialized.  When notifyReady() is called, waiting
+     * will cease.
+     */
     private synchronized void waitForReady() {
         while (!ready) {
             try {
@@ -340,11 +405,11 @@ public class PaintingGameController {
         });
     }*/
     
-    public void promptReady() {
+    public void promptReady(String promptText) {
         javafx.application.Platform.runLater(new Runnable() {
             @Override
             public void run() {
-            	drawingPrompt.setText(currentPrompt);
+            	drawingPrompt.setText(promptText);
             }
         });
     }
@@ -353,48 +418,31 @@ public class PaintingGameController {
         javafx.application.Platform.runLater(new Runnable() {
             @Override
             public void run() {
-            	outputMessage(It, AlertType.INFORMATION);
+            	outputMessage("Made It: " + It, AlertType.INFORMATION);
             }
         });
     }
     
-    class SetupServerThread extends Thread {
-
-        @Override
-        public void run() {
-            try {
-            	player2 = new socketHelper(3002);
-            	player2.writeString(user.getName());
-                /*
-                 * Notify SocketReaderThread that it can now start.
-                 */
-                notifyReady();
-            } catch (IOException e) {
-                    //outputMessage("Waiting on User", AlertType.ERROR);
-            	System.out.println(e.getMessage());
-                /*
-                 * This will notify the SocketReaderThread that it should exit.
-                 */
-                notifyReady();
-            }
-        }
-    }
 
     class SocketReaderThread extends Thread {
 
         @Override
         public void run() {
-            /*
+        	System.out.println("Hello Thread");
+        	
+        	/*
              * Wait until the socket is set up before beginning to read.
              */
         	/////FOUR SOCKET STATES
         	while(true)
         	{
+        		
         		//USERNAME
         		if(player2.getState() == socketState.USERNAME)
         		{
         			try {
 							user2 = new User(player2.readNextString());
+							
 							player2.setState(socketState.DRAWING);
 							if(isHost){
 								player2.writeString(currentPrompt);
@@ -406,8 +454,7 @@ public class PaintingGameController {
         		}else if(player2.getState() == socketState.DRAWING){
         			try {
 						if(!isHost){
-							currentPrompt = player2.readNextString();
-							promptReady();
+							promptReady(player2.readNextString());
 							player2.setState(socketState.COLOR);
 						}else{
 							player2.setState(socketState.COLOR);
@@ -418,16 +465,18 @@ public class PaintingGameController {
         				System.out.println(e.getMessage());
         			}
         		//COLOR EXCHANGE
-        		}else if(player2.getState() == socketState.COLOR){
-        			
-        		//SCORE EXCHANGE
         		}else if(player2.getState() == socketState.SCORE){
         			
-        		}	
+        		}
+        		
+        		try {
+					Thread.sleep(100);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             }
         }
     }
-
 	
->>>>>>> parent of 6aafdc5... Presentation Time
 }
