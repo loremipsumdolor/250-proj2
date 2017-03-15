@@ -40,6 +40,11 @@ public class socketHelper {
 		 
 	}
 	
+	//For testing purposes'
+	public Socket getSock() {
+		return this.sock;
+	}
+	
 	public synchronized void writeString(String name) throws IOException{
 		this.dOut.writeUTF(name);
 		this.dOut.flush(); // Send off the data

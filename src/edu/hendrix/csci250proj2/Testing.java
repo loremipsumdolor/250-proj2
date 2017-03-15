@@ -3,6 +3,8 @@ package edu.hendrix.csci250proj2;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.junit.Test;
@@ -11,6 +13,9 @@ import edu.hendrix.csci250proj2.network.socketHelper;
 import javafx.scene.control.Alert.AlertType;
 
 public class Testing {
+	
+	public final static int PORT = 8888;
+	public final static String TEST_MSG = "Hello there!";
 
 	@Test
 	public void testPromptString() {
@@ -37,19 +42,26 @@ public class Testing {
 	}
 	
 	@Test
-	public void testsocketHelper() {
-		//Checks creation
+	public void testsocketHelper() throws IOException{
+		
 		try {
-			socketHelper socket = new socketHelper("10.253.200.180", 3002);
-			//Test getState()
+		socketHelper socketClient = new socketHelper(PORT);			
+		Socket temp = socketClient.getSock();
+		String s = temp.getInetAddress() + "";
+		socketHelper socketHost = new socketHelper(s, PORT);
 			
-			//Test colorConstruct
-		
-		
 		} catch (IOException e) {
-			fail("Invalid IP");
+			fail("Invalid IP or PORT");
 		}
 		
 	}
-
 }
+	
+	
+	//socketHelper socketClient = new socketHelper(3002);
+	//socketClient.writeString("Testing 123");
+	//assertEquals(socketHost.readNextString(), "Testing 123");
+	//Start up your server that is listening on the port
+	//Test your client code who will contact local host with whatever your port number is
+	//Then just do your test, test your things sent equals the thing you received
+
