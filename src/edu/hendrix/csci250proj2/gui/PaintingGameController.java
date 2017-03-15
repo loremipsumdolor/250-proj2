@@ -232,7 +232,10 @@ public class PaintingGameController {
 		}
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 6aafdc5... Presentation Time
 	
 >>>>>>> parent of 6aafdc5... Presentation Time
 	@FXML
