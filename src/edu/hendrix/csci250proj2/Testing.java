@@ -4,10 +4,13 @@ import static org.junit.Assert.*;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+=======
+>>>>>>> parent of 4421185... Test Cases Started
 =======
 >>>>>>> parent of 4421185... Test Cases Started
 =======
@@ -47,6 +50,7 @@ public class Testing {
 	}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	
 	@Test
 	public void testsocketHelper() throws IOException{
@@ -72,6 +76,11 @@ public class Testing {
 	//Test your client code who will contact local host with whatever your port number is
 	//Then just do your test, test your things sent equals the thing you received
 
+=======
+
+}
+*/
+>>>>>>> parent of 4421185... Test Cases Started
 =======
 
 }
