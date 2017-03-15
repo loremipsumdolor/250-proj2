@@ -86,6 +86,9 @@ public class PaintingGameController {
 =======
 	private socketHelper player2;
 	private boolean connection;
+<<<<<<< HEAD
+>>>>>>> parent of 6aafdc5... Presentation Time
+=======
 >>>>>>> parent of 6aafdc5... Presentation Time
     private Thread socketReaderThread;
     private Thread setupThread;
@@ -160,6 +163,9 @@ public class PaintingGameController {
             socketReaderThread = new SocketReaderThread();
             socketReaderThread.start();
             outputMessage("Userin it", AlertType.INFORMATION);
+<<<<<<< HEAD
+>>>>>>> parent of 6aafdc5... Presentation Time
+=======
 >>>>>>> parent of 6aafdc5... Presentation Time
         } catch (Exception e) {
         	outputMessage(e.getMessage(), AlertType.INFORMATION);
@@ -190,6 +196,9 @@ public class PaintingGameController {
             socketReaderThread = new SocketReaderThread();
             socketReaderThread.start();
             outputMessage("Hostin it", AlertType.INFORMATION);
+<<<<<<< HEAD
+>>>>>>> parent of 6aafdc5... Presentation Time
+=======
 >>>>>>> parent of 6aafdc5... Presentation Time
         } catch (Exception e) {
         	outputMessage(e.getMessage(), AlertType.INFORMATION);
@@ -244,8 +253,11 @@ public class PaintingGameController {
 		}
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
+=======
+>>>>>>> parent of 6aafdc5... Presentation Time
 	
 >>>>>>> parent of 6aafdc5... Presentation Time
 	@FXML
@@ -366,7 +378,10 @@ public class PaintingGameController {
     }
     
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 6aafdc5... Presentation Time
     class SetupServerThread extends Thread {
 
         @Override
