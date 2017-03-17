@@ -12,6 +12,7 @@ import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
 import edu.hendrix.csci250proj2.network.SocketReaderThread;
 import edu.hendrix.csci250proj2.network.color;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -374,7 +375,7 @@ public class PaintingGameController {
             	drawingPrompt.setText(promptText);
             }
         });
-    }
+    } 
     
 	public void setUserArea(String username){
 		javafx.application.Platform.runLater(new Runnable() {
@@ -394,17 +395,5 @@ public class PaintingGameController {
             }
         });
     }
-    
-    public void madeIT(String It) {
-        javafx.application.Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-            	outputMessage("Made It: " + It, AlertType.INFORMATION);
-            }
-        });
-    }
-    
-	
 }
-
-
+    

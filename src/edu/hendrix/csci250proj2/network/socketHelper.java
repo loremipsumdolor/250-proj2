@@ -23,13 +23,12 @@ public class socketHelper {
 		    this.sock = new Socket(hostName, portNumber);
 		    this.dOut = new DataOutputStream(sock.getOutputStream());
 		    this.dIn = new DataInputStream(sock.getInputStream());
-		    this.state = socketState.USERNAME;
+		    this.setState(socketState.USERNAME);
 	}
 	
 	public socketHelper(int portNumber) throws IOException{
 		 ServerSocket serverSocket = new ServerSocket(portNumber);
 		 this.sock = serverSocket.accept();
-		 this.state = socketState.USERNAME;
 		 if (this.sock != null && !this.sock.isClosed()) {
              /*
               * Get input and output streams
@@ -37,7 +36,8 @@ public class socketHelper {
 			 this.dOut = new DataOutputStream(sock.getOutputStream());
 			 this.dIn = new DataInputStream(sock.getInputStream());
          }
-		 //serverSocket.close();
+		 serverSocket.close();
+		 this.setState(socketState.USERNAME);
 		 
 	}
 	
@@ -72,7 +72,7 @@ public class socketHelper {
 		this.dOut.writeInt(score);
 		this.dOut.flush();
 	}
-	
+	 
 	public synchronized int readInt() throws IOException{
 		int score = this.dIn.readInt();
 		return score;
@@ -80,6 +80,7 @@ public class socketHelper {
 	
 	public synchronized String readNextString() throws IOException{
 		return dIn.readUTF();
+
 	}
 	
 	public synchronized socketState getState(){
@@ -99,7 +100,6 @@ public class socketHelper {
 		this.username = user;
 		
 	}
-	
 }
 
 
