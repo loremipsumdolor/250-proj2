@@ -7,11 +7,11 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+
 import edu.hendrix.csci250proj2.DrawSelect;
 import edu.hendrix.csci250proj2.User;
-import edu.hendrix.csci250proj2.network.socketHelper;
-import edu.hendrix.csci250proj2.network.socketHelper.colorStruct;
-import edu.hendrix.csci250proj2.network.socketState;
+import edu.hendrix.csci250proj2.network.SocketReaderThread;
+import edu.hendrix.csci250proj2.network.color;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
@@ -68,9 +68,7 @@ public class PaintingGameController {
 	
 	//Users
 	private User user;
-	private User user2;
 	private int rating;
-	private int otherRating;
 	
 	//Drawing
 	private double sx;
@@ -78,19 +76,21 @@ public class PaintingGameController {
 	private Color currentColor = Color.BLACK;
 	private double inkRemainingDubs = 1.0;
     private boolean ready = false;
+    private int finalScore = 4;
+    
     
     //Prompts
     ArrayList<String> potentialDrawings;
     String currentPrompt;
     
     //Networking
-    private boolean isHost = false;
-	private socketHelper player2;
     private Thread socketReaderThread;
-    private Thread setupThread;
+
 	
 	
 	private Node cleanDrawingArea;
+	
+
 
 	@FXML
 	private void initialize() {
@@ -157,8 +157,8 @@ public class PaintingGameController {
 					
     		Optional<String> IPresult = tryConnectionDialog.showAndWait();
     		try{
-    				player2 = new socketHelper(IPresult.get(),3002);
-    				player2.writeString(user.getName());
+    				socketReaderThread = new SocketReaderThread(IPresult.get(),user.getName(),currentPrompt, this);
+    				socketReaderThread.start();
     				notifyReady();
     				
     		}catch(IOException | NoSuchElementException e){//Catch an IO Error
@@ -174,8 +174,8 @@ public class PaintingGameController {
             /*
              * Background thread to continuously read from the input stream.
              */
-            socketReaderThread = new SocketReaderThread();
-            socketReaderThread.start();
+            
+           
         } catch (Exception e) {
         	outputMessage("Socket Reader Error" + e.getMessage(), AlertType.INFORMATION);
         }
@@ -183,39 +183,23 @@ public class PaintingGameController {
 	
 	public void startHost(){
 		//CONNECTION SCREEN
-		isHost = true;
 		drawingPrompt.setText(currentPrompt);
 		try {
             /*
              * Background thread to set up and open the input and
              * output data streams.
              */
-			try {
-            	player2 = new socketHelper(3002);
-            	player2.writeString(user.getName());
-                /*
-                 * Notify SocketReaderThread that it can now start.
-                 */
-                notifyReady();
-            } catch (IOException e) {
-                    //outputMessage("Waiting on User", AlertType.ERROR);
-            	System.out.println(e.getMessage());
-                /*
-                 * This will notify the SocketReaderThread that it should exit.
-                 */
-            }
-            /*
-             * Background thread to continuously read from the input stream.
-             */
-            socketReaderThread = new SocketReaderThread();
-            socketReaderThread.start();
+			 socketReaderThread = new SocketReaderThread(user.getName(),currentPrompt,this);
+			 socketReaderThread.start();
+             /*
+              * Notify SocketReaderThread that it can now start.
+              */
+              notifyReady();
         } catch (Exception e) {
         	e.printStackTrace();
         	outputMessage("Socket Reader Error: ", AlertType.INFORMATION);
         }  
-		
-		
-		
+	
 	}
     
 	public void startDrag(MouseEvent event) {
@@ -235,6 +219,8 @@ public class PaintingGameController {
 			line.setStroke(currentColor);
 			line.setStrokeLineCap(StrokeLineCap.ROUND);
 			drawingArea.getChildren().add(line);
+			((SocketReaderThread) socketReaderThread).addColToSendStack(new color(currentColor.getRed(),currentColor.getGreen(),currentColor.getBlue(),sx,sy,fx,fy));
+			//System.out.println(sendStack.isEmpty());
 			sx = fx;
 			sy = fy;
 			inkRemainingDubs -= .005;
@@ -245,6 +231,8 @@ public class PaintingGameController {
 					line1.setStroke(currentColor);
 					line1.setStrokeLineCap(StrokeLineCap.ROUND);
 					drawingArea.getChildren().add(line1);
+					((SocketReaderThread) socketReaderThread).addColToSendStack(new color(currentColor.getRed(),currentColor.getGreen(),currentColor.getBlue(),sx,sy,fx,fy));
+					//System.out.println(sendStack.isEmpty());
 					sx = fx;
 					sy = fy;
 					inkRemainingDubs -= .001;
@@ -262,41 +250,15 @@ public class PaintingGameController {
 			}
 		}
 	}
-	/*
-	public void draw(double fx, double fy, int col) {
+	
+	public void drawer(double r, double g, double b,double sx, double sy,double fx, double fy) {
 		//Edited so it doesn't draw everywhere
 			Line line = new Line(sx, sy, fx, fy);
-			line.setStroke(new Color(col));
+			line.setStroke(new Color(r,g,b,1));
 			line.setStrokeLineCap(StrokeLineCap.ROUND);
 			drawingArea.getChildren().add(line);
-			sx = fx;
-			sy = fy;
-			inkRemainingDubs -= .005;
-			inkRemaining.setProgress(inkRemainingDubs);
-			if (fx > 62 && fx < 590 && fy > 65 && fy < 426) {
-				if (!eraseButton.isSelected()) {
-					Line line1 = new Line(sx, sy, fx, fy);
-					line1.setStroke(currentColor);
-					line1.setStrokeLineCap(StrokeLineCap.ROUND);
-					drawingArea.getChildren().add(line1);
-					sx = fx;
-					sy = fy;
-					inkRemainingDubs -= .001;
-					inkRemaining.setProgress(inkRemainingDubs);
-				} else if (eraseButton.isSelected() && fx > 72 && fx < 580 && fy > 75 && fy < 416) {
-					Line line1 = new Line(sx, sy, fx, fy);
-					line1.setStroke(currentColor);
-					line1.setStrokeLineCap(StrokeLineCap.ROUND);
-					line1.setStrokeWidth(20.0);
-					drawingArea.getChildren().add(line1);
-					sx = fx;
-					sy = fy;
-					}
-				}
-			}
-		}
 	}
-	*/
+	
 	
 	
 	
@@ -323,8 +285,11 @@ public class PaintingGameController {
 	@FXML
 	private void setDone() {
 		user.setDone();
+		System.out.println("UserDone");
+		ready = false;
 		rateDrawing();
 		endOfMatch();
+		
 	}
 	
 	private void outputMessage(String message, AlertType alertType) {
@@ -335,7 +300,7 @@ public class PaintingGameController {
 	
 	public void rateDrawing() {
 		ArrayList<String> ratings = new ArrayList<>(Arrays.asList("0", "1", "2", "3", "4", "5"));
-		player2.setState(socketState.SCORE);
+		
 		ChoiceDialog<String> ratingDialog = new ChoiceDialog<>("0", ratings);
 		ratingDialog.setTitle("Painting Game");
 		ratingDialog.setHeaderText("Rate Your Opponent!");
@@ -343,21 +308,37 @@ public class PaintingGameController {
 		Optional<String> result = ratingDialog.showAndWait();
 		if (result.isPresent()){
 		    rating = Integer.parseInt(result.get());
+		    ((SocketReaderThread) socketReaderThread).addColToSendStack(new color(0,0,0,0,0,0,0));
+		    ((SocketReaderThread) socketReaderThread).sendFinalScore(rating);
+		}else{
+			((SocketReaderThread) socketReaderThread).addColToSendStack(new color(0,0,0,0,0,0,0));
+			((SocketReaderThread) socketReaderThread).sendFinalScore(0);
 		}
 	}
 	
-	private void endOfMatch() {
+	public void endOfMatch() {
+		if(!ready){
+			Alert userStillRating = new Alert(AlertType.INFORMATION);
+			userStillRating.setTitle("Not Done Drawing Yet!!");
+			userStillRating.setContentText("The other user hasn't rated you yet");
+		}
+		
 		String starText = null;
 		Alert matchEndAlert = new Alert(AlertType.INFORMATION);
 		matchEndAlert.setTitle("Painting Game");
 		matchEndAlert.setHeaderText("Congratulations!");
-		if(otherRating == 1){
+		if(finalScore == 1){
 			starText = "star";
 		} else {
 			starText = "stars";
 		}
-		matchEndAlert.setContentText("You earned " + Integer.toString(otherRating) + " " + starText + ".");
+		matchEndAlert.setContentText("You earned " + Integer.toString(finalScore) + " " + starText + ".");
 		matchEndAlert.showAndWait();
+	}
+	
+	public void setFinalRating(int score){
+		this.finalScore = score;
+		notifyReady();
 	}
 	
 	/*
@@ -370,6 +351,7 @@ public class PaintingGameController {
             try {
                 wait();
             } catch (InterruptedException e) {
+            	
             }
         }
     }
@@ -380,37 +362,35 @@ public class PaintingGameController {
      */
     private synchronized void notifyReady() {
         ready = true;
-        //outputMessage("Successfully Connected!", AlertType.INFORMATION);
         notifyAll();
     }
-    
-    /**
-     * Called whenever the open/closed status of the Socket
-     * changes.  In JavaFX, this method must be run on the main thread and is
-     * accomplished by the Platform.runLater() call.  Failure to do so
-     * *will* result in strange errors and exceptions.
-     * @param isClosed true if the socket is closed
-     */
-    /*
-    public void onClosedStatus(final boolean isClosed) {
-        javafx.application.Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                //fxListener.onClosedStatus(isClosed);
-            	if(!isClosed){
-            		connection = true;
-            	}else{
-            		connection = false;
-            	}
-            }
-        });
-    }*/
     
     public void promptReady(String promptText) {
         javafx.application.Platform.runLater(new Runnable() {
             @Override
             public void run() {
+            	ready = false;
+            	currentPrompt = promptText;
             	drawingPrompt.setText(promptText);
+            }
+        });
+    }
+    
+	public void setUserArea(String username){
+		javafx.application.Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	userfield.appendText(username);
+            }
+        });
+		
+	}
+    
+    public void drawFX(color col) {
+        javafx.application.Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	drawer(col.getR(),col.getG(),col.getB(),col.getSX(),col.getSY(),col.getFX(),col.getFY());
             }
         });
     }
@@ -424,64 +404,6 @@ public class PaintingGameController {
         });
     }
     
-
-    class SocketReaderThread extends Thread {
-
-        @Override
-        public void run() {
-        	System.out.println("Hello Thread");
-        	
-        	/*
-             * Wait until the socket is set up before beginning to read.
-             */
-        	/////FOUR SOCKET STATES
-        	while(true)
-        	{
-        		
-        		//USERNAME
-        		if(player2.getState() == socketState.USERNAME)
-        		{
-        			try {
-							user2 = new User(player2.readNextString());
-							
-							player2.setState(socketState.DRAWING);
-							if(isHost){
-								player2.writeString(currentPrompt);
-							}
-					} catch (IOException e) {
-						System.out.println(e.getMessage());
-					}
-        		//PROMPT EXCHANGE
-        		}else if(player2.getState() == socketState.DRAWING){
-        			try {
-						if(!isHost){
-							promptReady(player2.readNextString());
-							player2.setState(socketState.COLOR);
-						}else{
-							player2.setState(socketState.COLOR);
-							
-						}
-						
-        			} catch (IOException e) {
-        				System.out.println(e.getMessage());
-        			}
-        		//COLOR EXCHANGE
-        		}else if(player2.getState() == socketState.SCORE){
-        			
-        		}
-        		
-        		try {
-					Thread.sleep(100);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-            }
-        }
-    }
-    
-    
-
 	
 }
 

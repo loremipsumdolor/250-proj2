@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
-import edu.hendrix.csci250proj2.gui.PaintingGameController;
+import edu.hendrix.csci250proj2.network.color;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,6 +17,7 @@ public class socketHelper {
 	private DataOutputStream dOut; 
 	private DataInputStream dIn;
 	private socketState state;
+	private String username;
 
 	public socketHelper(String hostName, int portNumber) throws UnknownHostException, IOException{
 		    this.sock = new Socket(hostName, portNumber);
@@ -45,32 +46,40 @@ public class socketHelper {
 		this.dOut.flush(); // Send off the data
 	}
 	
-	public synchronized void writeColor(int col, int x, int y) throws IOException{
-		this.dOut.writeInt(col);
-		this.dOut.writeInt(x);
-		this.dOut.writeInt(y);
+	public synchronized void writeColor(color sendCol) throws IOException{
+		this.dOut.writeDouble(sendCol.getR());
+		this.dOut.writeDouble(sendCol.getG());
+		this.dOut.writeDouble(sendCol.getB());
+		this.dOut.writeDouble(sendCol.getSX());
+		this.dOut.writeDouble(sendCol.getSY());
+		this.dOut.writeDouble(sendCol.getFX());
+		this.dOut.writeDouble(sendCol.getFY());
 		this.dOut.flush(); // Send off the data
 	}
 	
-	public synchronized colorStruct readColor() throws IOException{
-		int col = this.dIn.readInt();
-		int x = this.dIn.readInt();
-		int y = this.dIn.readInt();
-		return new colorStruct(col,x,y);
+	public synchronized color readColor() throws IOException{
+		double r = this.dIn.readDouble();
+		double g = this.dIn.readDouble();
+		double b = this.dIn.readDouble();
+		double x = this.dIn.readDouble();
+		double y = this.dIn.readDouble();
+		double fx = this.dIn.readDouble();
+		double fy = this.dIn.readDouble();
+		return new color(r,g,b,x,y,fx,fy);
+	}
+	
+	public synchronized void writeInt(int score) throws IOException{
+		this.dOut.writeInt(score);
+		this.dOut.flush();
+	}
+	
+	public synchronized int readInt() throws IOException{
+		int score = this.dIn.readInt();
+		return score;
 	}
 	
 	public synchronized String readNextString() throws IOException{
-		//System.out.println("readNextResult" + dIn.readUTF() );
-		//System.out.flush();
-		/*
-		String Name = null;
-		while(dIn.readUTF() != null){
-			
-			Name += dIn.readUTF();
-		}
-		
-		return Name;
-		*/return dIn.readUTF();
+		return dIn.readUTF();
 	}
 	
 	public synchronized socketState getState(){
@@ -81,30 +90,15 @@ public class socketHelper {
 		this.state = st;
 	}
 	
-	public class colorStruct{
-		int color;
-		int x;
-		int y;
+	public synchronized String getUsername(){
+		return this.username;
 		
-		colorStruct(int c, int x, int y){
-			this.color = c;
-			this.x = x;
-			this.y = y;
-		}
-		
-		int getCol(){
-			return this.color;
-		}
-		
-		int getX(){
-			return this.x;
-		}
-		
-		int getY(){
-			return this.y;
-		}
 	}
 	
+	public synchronized void setUsername(String user){
+		this.username = user;
+		
+	}
 	
 }
 
