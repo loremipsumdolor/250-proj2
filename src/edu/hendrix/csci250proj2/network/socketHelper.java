@@ -45,15 +45,14 @@ public class socketHelper {
 	
 	public synchronized String readNextString() throws IOException{
 		System.out.println("readNextResult" + dIn.readUTF() );
-		/*
-		String Name = null;
+		/*String Name = null;
 		while(dIn.readUTF() != null){
 			
 			Name += dIn.readUTF();
 		}
 		
-		return Name;
-		*/return "blah";
+		return Name;*/
+		return "blah";
 	}
 	
 	public socketState getState(){
